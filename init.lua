@@ -110,7 +110,7 @@ do
   vim.o.number = true
   -- You can also add relative line numbers, to help with jumping.
   --  Experiment for yourself to see if you like it!
-  -- vim.o.relativenumber = true
+  vim.o.relativenumber = true
 
   -- Enable mouse mode, can be useful for resizing splits for example!
   vim.o.mouse = 'a'
@@ -220,10 +220,10 @@ do
   vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
   -- TIP: Disable arrow keys in normal mode
-  -- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
-  -- vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
-  -- vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
-  -- vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
+  vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
+  vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
+  vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
+  vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
 
   -- Keybinds to make split navigation easier.
   --  Use CTRL+<hjkl> to switch between windows
@@ -313,6 +313,11 @@ do
       if name == 'nvim-treesitter' then
         if not ev.data.active then vim.cmd.packadd 'nvim-treesitter' end
         vim.cmd 'TSUpdate'
+        return
+      end
+
+      if name == 'avante.nvim' and vim.fn.executable 'make' == 1 then
+        run_build(name, { 'make' }, ev.data.path)
         return
       end
     end,
@@ -423,18 +428,27 @@ do
   -- change the command under that to load whatever the name of that colorscheme is.
   --
   -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-  vim.pack.add { gh 'folke/tokyonight.nvim' }
-  ---@diagnostic disable-next-line: missing-fields
-  require('tokyonight').setup {
-    styles = {
-      comments = { italic = false }, -- Disable italics in comments
-    },
-  }
+  --
+  -- Uncomment one of the blocks below to switch colorscheme:
+  --
+  -- vim.pack.add { gh 'folke/tokyonight.nvim' }
+  -- ---@diagnostic disable-next-line: missing-fields
+  -- require('tokyonight').setup {
+  --   styles = {
+  --     comments = { italic = false }, -- Disable italics in comments
+  --   },
+  -- }
+  -- vim.cmd.colorscheme 'tokyonight-night'
+  --
+  -- vim.pack.add { gh 'catppuccin/nvim' }
+  -- require('catppuccin').setup {}
+  -- vim.cmd.colorscheme 'catppuccin-latte'
 
-  -- Load the colorscheme here.
-  -- Like many other themes, this one has different styles, and you could load
-  -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-  vim.cmd.colorscheme 'tokyonight-night'
+  vim.pack.add { gh 'ellisonleao/gruvbox.nvim' }
+  require('gruvbox').setup { contrast = 'soft' }
+  vim.o.background = 'light'
+  vim.o.termguicolors = true
+  vim.cmd.colorscheme 'gruvbox'
 
   -- Highlight todo, notes, etc in comments
   vim.pack.add { gh 'folke/todo-comments.nvim' }
@@ -734,7 +748,7 @@ do
   ---@type table<string, vim.lsp.Config>
   local servers = {
     -- clangd = {},
-    -- gopls = {},
+    gopls = {},
     -- pyright = {},
     -- tsc = {},
     --
@@ -803,7 +817,7 @@ do
   -- You can press `g?` for help in this menu.
   local ensure_installed = vim.tbl_keys(servers or {})
   vim.list_extend(ensure_installed, {
-    -- You can add other tools here that you want Mason to install
+    'goimports', 'gofumpt', 'gomodifytags', 'impl',
   })
 
   require('mason-tool-installer').setup { ensure_installed = ensure_installed }
@@ -824,6 +838,9 @@ do
   require('conform').setup {
     notify_on_error = false,
     format_on_save = function(bufnr)
+      if vim.b[bufnr].disable_autoformat then
+        return nil
+      end
       -- You can specify filetypes to autoformat on save here:
       local enabled_filetypes = {
         -- lua = true,
@@ -1015,15 +1032,15 @@ do
   --  Uncomment any of the lines below to enable them (you will need to restart nvim).
   --
   -- require 'kickstart.plugins.debug'
-  -- require 'kickstart.plugins.indent_line'
-  -- require 'kickstart.plugins.lint'
-  -- require 'kickstart.plugins.autopairs'
-  -- require 'kickstart.plugins.neo-tree'
+  require 'kickstart.plugins.indent_line'
+  require 'kickstart.plugins.lint'
+  require 'kickstart.plugins.autopairs'
+  require 'kickstart.plugins.neo-tree'
 
   -- NOTE: You can add your own plugins, configuration, etc. in `lua/custom/plugins/*.lua`.
   --
   -- For independent modules, uncomment the convenience loader:
-  -- require 'custom.plugins'
+  require 'custom.plugins'
   --
   -- `custom.plugins` automatically loads files from that directory, but their
   -- order is unspecified. If plugins depend on each other, keep them in the same

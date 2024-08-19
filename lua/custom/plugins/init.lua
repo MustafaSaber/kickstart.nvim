@@ -3,12 +3,46 @@
 --
 -- See the kickstart.nvim README for more information
 
--- Iterate over all Lua files in the plugins directory and load them.
--- `vim.fs.dir()` iteration order is unspecified and must not be relied upon.
-local plugins_dir = vim.fs.joinpath(vim.fn.stdpath 'config', 'lua', 'custom', 'plugins')
-for file_name, type in vim.fs.dir(plugins_dir, { follow = true }) do
-  if (type == 'file' or type == 'link') and file_name:match '%.lua$' and file_name ~= 'init.lua' then
-    local module = file_name:gsub('%.lua$', '')
-    require('custom.plugins.' .. module)
-  end
-end
+vim.pack.add {
+  'https://github.com/yetone/avante.nvim',
+  'https://github.com/nvim-lua/plenary.nvim',
+  'https://github.com/MunifTanjim/nui.nvim',
+  -- Optional dependencies
+  {
+    -- support for image pasting
+    src = 'https://github.com/HakonHarnes/img-clip.nvim',
+  },
+  {
+    src = 'https://github.com/MeanderingProgrammer/render-markdown.nvim',
+  },
+}
+
+require('img-clip').setup {
+  default = {
+    embed_image_as_base64 = false,
+    prompt_for_file_name = false,
+    drag_and_drop = {
+      insert_mode = true,
+    },
+  },
+}
+
+require('render-markdown').setup {
+  file_types = { 'markdown', 'Avante' },
+}
+
+require('avante').setup {
+  provider = 'openai',
+  auto_suggestions_provider = 'openai',
+  providers = {
+    openai = {
+      endpoint = 'https://zllm.data.zalan.do/v1',
+      model = 'bedrock/anthropic.claude-sonnet-4-20250514-v1:0',
+      api_key_name = 'cmd:ztoken',
+      extra_request_body = {
+        temperature = 0.3,
+        max_tokens = 8000,
+      },
+    },
+  },
+}
