@@ -7,6 +7,8 @@ vim.pack.add {
   'https://github.com/yetone/avante.nvim',
   'https://github.com/nvim-lua/plenary.nvim',
   'https://github.com/MunifTanjim/nui.nvim',
+  'https://github.com/ColinKennedy/mega.logging',
+  'https://github.com/ColinKennedy/mega.cmdparse',
   -- Optional dependencies
   {
     -- support for image pasting
